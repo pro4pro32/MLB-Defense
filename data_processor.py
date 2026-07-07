@@ -117,53 +117,50 @@ def filter_df(
 # ── Internal transformations ──────────────────────────────────────────────────
 
 def _process_catch_prob(raw: pd.DataFrame) -> pd.DataFrame:
-    """Rename and compute bucket-level columns from raw catch-prob frame."""
     df = raw.copy()
-
-    # Normalise player name
-    name_col = _find_col(df, ["last_name, first_name", "player_name", "name"])
-    df["player_name"] = df[name_col].apply(normalise_name) if name_col else "Unknown"
-    df["player_id"]   = df.get("player_id", pd.Series(np.nan, index=df.index))
-    df["season"]      = df["season"].apply(safe_int)
-    df["oaa"]         = df["oaa"].apply(safe_int) if "oaa" in df.columns else 0
+    
+    # Normalizacja nazw graczy
+    if "player_name" in df.columns:
+        df["player_name"] = df["player_name"].apply(normalise_name)
+    elif "last_name, first_name" in df.columns:
+        df["player_name"] = df["last_name, first_name"].apply(normalise_name)
 
     rows = []
     for _, row in df.iterrows():
-        rec: dict = {
-            "player_name": row["player_name"],
-            "player_id":   safe_int(row.get("player_id", 0)),
-            "season":      safe_int(row.get("season", 0)),
-            "oaa":         safe_int(row.get("oaa", 0)),
+        rec = {
+            "player_name": row.get("player_name", "Unknown"),
+            "player_id": safe_int(row.get("player_id")),
+            "season": safe_int(row.get("season")),
+            "team": row.get("team_name_abbrev") or row.get("team", ""),
+            "oaa": safe_float(row.get("oaa") or row.get("outs_above_average")),
+            "total_opps": 0,
         }
 
-        total_att = 0
         for b in BUCKETS:
-            sfx = b.col_suffix          # e.g. "1stars"
-            att     = safe_int(row.get(f"n_opp_{sfx}", 0))
-            caught  = safe_int(row.get(f"n_fieldout_{sfx}", 0))
-            # raw pct column name quirk: n_1star_percent (singular)
-            pct_key = f"n_{sfx[0]}star_percent"
-            catch_pct = safe_float(row.get(pct_key, np.nan))
+            prefix = f"{b.id}star" if b.id == 1 else f"{b.id}stars"
+            
+            att = safe_int(row.get(f"n_opp_{prefix}", 0))
+            caught = safe_int(row.get(f"n_fieldout_{prefix}", 0))
+            
+            # Czasem kolumny mają inne nazwy
+            if att == 0:
+                att = safe_int(row.get(f"n_opportunities_{b.id}star", 0))
+            if caught == 0:
+                caught = safe_int(row.get(f"n_fieldouts_{b.id}star", 0))
 
-            expected = att * (b.exp_pct / 100)
-            oaa_b    = (caught - expected) if att > 0 else np.nan
+            catch_pct = safe_float(row.get(f"n_{b.id}star_percent", np.nan))
+            expected = att * (b.exp_pct / 100.0)
+            oaa_b = caught - expected if att > 0 else np.nan
 
-            # Estimate avg_cp within bucket using the actual catch% as a proxy.
-            # The true avg_cp (per-play) is not in aggregated data.
-            # We use a weighted blend: if catch_pct >> exp_pct → plays skewed high;
-            # if catch_pct << exp_pct → plays skewed toward lower end of range.
-            avg_cp = _estimate_avg_cp(b, catch_pct) if (att > 0 and not np.isnan(catch_pct)) else np.nan
-
-            rec[f"b{b.id}_att"]       = att
-            rec[f"b{b.id}_caught"]    = caught
+            rec[f"b{b.id}_att"] = att
+            rec[f"b{b.id}_caught"] = caught
             rec[f"b{b.id}_catch_pct"] = round(catch_pct, 1) if not np.isnan(catch_pct) else None
-            rec[f"b{b.id}_avg_cp"]    = round(avg_cp, 1)    if not np.isnan(avg_cp)    else None
-            rec[f"b{b.id}_exp"]       = round(expected, 2)
-            rec[f"b{b.id}_oaa"]       = round(oaa_b, 2)     if not np.isnan(oaa_b)     else None
+            rec[f"b{b.id}_avg_cp"] = round(catch_pct, 1) if not np.isnan(catch_pct) else None
+            rec[f"b{b.id}_exp"] = round(expected, 2)
+            rec[f"b{b.id}_oaa"] = round(oaa_b, 2) if not np.isnan(oaa_b) else None
 
-            total_att += att
+            rec["total_opps"] += att
 
-        rec["total_opps"] = total_att
         rows.append(rec)
 
     return pd.DataFrame(rows)
