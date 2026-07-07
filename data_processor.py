@@ -17,7 +17,8 @@ from typing import Optional
 import numpy as np
 import pandas as pd
 
-from src.utils import (
+# Płaskie importy
+from utils import (
     BUCKETS, SEASON_GAMES, OF_POSITIONS,
     safe_float, safe_int, normalise_name,
     add_percentile_column,
