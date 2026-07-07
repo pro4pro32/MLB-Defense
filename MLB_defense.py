@@ -1,15 +1,7 @@
 """
-app.py
-------
-MLB Outfield Dashboard — Streamlit entry point.
-
-Run:
-    streamlit run app.py
-
-This file contains only UI logic.
-All data loading  →  src/data_loader.py
-All transformation →  src/data_processor.py
-All helpers        →  src/utils.py
+MLB Outfield Dashboard — Streamlit
+Główny plik aplikacji
+Uruchomienie: streamlit run MLB_defense.py
 """
 
 from __future__ import annotations
@@ -21,7 +13,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
-from data_loader   import get_combined_data, build_and_cache_data, cache_age_message, COMBINED_PATH
+# Płaskie importy (bez src.)
+from data_loader import get_combined_data, build_and_cache_data, cache_age_message, COMBINED_PATH
 from data_processor import build_dashboard_df, filter_df
 from utils import (
     BUCKETS, BUCKET_LABELS, BUCKET_COLORS, SEASONS, OF_POSITIONS,
