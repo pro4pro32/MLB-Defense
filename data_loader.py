@@ -25,7 +25,8 @@ from typing import Optional
 import pandas as pd
 import streamlit as st
 
-from src.utils import SEASONS, safe_int
+# Płaskie importy
+from utils import SEASONS, safe_int
 
 log = logging.getLogger(__name__)
 
