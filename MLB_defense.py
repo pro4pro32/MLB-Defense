@@ -21,9 +21,9 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
-from src.data_loader   import get_combined_data, build_and_cache_data, cache_age_message, COMBINED_PATH
-from src.data_processor import build_dashboard_df, filter_df
-from src.utils import (
+from data_loader   import get_combined_data, build_and_cache_data, cache_age_message, COMBINED_PATH
+from data_processor import build_dashboard_df, filter_df
+from utils import (
     BUCKETS, BUCKET_LABELS, BUCKET_COLORS, SEASONS, OF_POSITIONS,
     fmt_oaa, fmt_pct, fmt_speed, fmt_int, percentile_label,
 )
