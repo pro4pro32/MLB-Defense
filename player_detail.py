@@ -34,7 +34,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import streamlit as st
 
-from src.utils import (
+from utils import (
     BUCKETS, fmt_oaa, fmt_pct, fmt_speed, fmt_int,
     percentile_label,
 )
