@@ -1512,25 +1512,33 @@ with tab_buckets:
                                  title=f"Opportunities by bracket — top {n_plt} sorted by {sort_lbl}",
                                  labels={"Opps":"Opportunities","Player":""})
                 fig_bar.update_layout(
-    height=max(420, n_plt * 42 + 110),
+    height=max(450, n_plt * 44 + 140),
     plot_bgcolor="white",
     paper_bgcolor="white",
     font_family="system-ui",
     yaxis=dict(
         categoryorder="total ascending",
-        tickfont=dict(size=11),
+        tickfont=dict(size=12),
         automargin=True,
     ),
     legend=dict(
         orientation="h",
         yanchor="bottom",
-        y=1.04,
+        y=1.12,                    # wyżej, żeby nie nachodziło na tytuł
         xanchor="center",
         x=0.5,
-        font=dict(size=10),
+        font=dict(size=11),
+        bgcolor="rgba(255,255,255,0.9)",
+        borderwidth=0,
     ),
-    margin=dict(t=90, l=140, r=30, b=40),
-    title=dict(font=dict(size=14)),
+    margin=dict(t=120, l=160, r=40, b=50),   # duży top margin
+    title=dict(
+        text=f"Opportunities by bracket — top {n_plt} sorted by {sort_lbl}",
+        font=dict(size=15),
+        y=0.98,
+        x=0.5,
+        xanchor="center",
+    ),
 )
                 fig_bar.update_xaxes(showgrid=True, gridcolor="#eee")
                 st.plotly_chart(fig_bar, use_container_width=True)
@@ -1560,24 +1568,27 @@ with tab_buckets:
                     colorbar=dict(title="Avg CP%", thickness=14, len=0.7),
                 ))
                 fig_h.update_layout(
-    height=max(360, len(top_pl) * 38 + 130),
+    height=max(400, len(top_pl) * 40 + 160),
     plot_bgcolor="white",
     paper_bgcolor="white",
     font_family="system-ui",
     xaxis=dict(
         side="top",
         tickfont=dict(size=11),
+        tickangle=-35,             # lekkie nachylenie — czytelniejsze
         automargin=True,
     ),
     yaxis=dict(
-        tickfont=dict(size=11),
+        tickfont=dict(size=12),
         automargin=True,
     ),
-    margin=dict(l=180, t=100, r=40, b=40),
+    margin=dict(l=190, t=130, r=50, b=40),
     title=dict(
         text="Lower = harder plays within that bracket",
-        font=dict(size=14),
-        y=0.98,
+        font=dict(size=15),
+        y=0.97,
+        x=0.5,
+        xanchor="center",
     ),
 )
                 st.plotly_chart(fig_h, use_container_width=True)
