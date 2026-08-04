@@ -1531,7 +1531,7 @@ with tab_buckets:
         bgcolor="rgba(255,255,255,0.9)",
         borderwidth=0,
     ),
-    margin=dict(t=120, l=160, r=40, b=50),   # duży top margin
+    margin=dict(t=150, l=160, r=40, b=50),   # duży top margin
     title=dict(
         text=f"Opportunities by bracket — top {n_plt} sorted by {sort_lbl}",
         font=dict(size=15),
